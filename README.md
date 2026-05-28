@@ -2,6 +2,9 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+# Download APK
+Download here: https://github.com/imtiaz-ahmed-ziad/Timer-IOS-Standby-Style-/releases/download/timer-app/Timer.IOS-Standby.Style.apk
+
 # Run and deploy your AI Studio app
 
 This contains everything you need to run your app locally.
