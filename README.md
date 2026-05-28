@@ -3,7 +3,7 @@
 </div>
 
 # Download APK
-Download here: https://github.com/imtiaz-ahmed-ziad/Timer-IOS-Standby-Style-/releases/download/timer-app/Timer.IOS-Standby.Style.apk
+Download link: https://github.com/imtiaz-ahmed-ziad/Timer-IOS-Standby-Style-/releases/download/timer-app/Timer.IOS-Standby.Style.apk
 
 # Run and deploy your AI Studio app
 
