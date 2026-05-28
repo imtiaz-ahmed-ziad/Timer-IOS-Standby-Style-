@@ -58,6 +58,38 @@ android {
   testOptions { unitTests { isIncludeAndroidResources = true } }
 }
 
+val buildDirFile = layout.buildDirectory.get().asFile
+val rootDirFile = rootDir
+
+tasks.register("renameDebugApk") {
+    val buildOutputsDir = File(rootDirFile, ".build-outputs")
+    val appDebugApk = File(buildDirFile, "outputs/apk/debug/app-debug.apk")
+    val destApk = File(buildOutputsDir, "Timer (IOS-Standby Style).apk")
+    val destInBuild = File(buildDirFile, "outputs/apk/debug/Timer (IOS-Standby Style).apk")
+
+    doLast {
+        buildOutputsDir.mkdirs()
+        
+        // Deleting the old app-debug.apk to keep the directory clean as requested
+        val oldAppDebug = File(buildOutputsDir, "app-debug.apk")
+        if (oldAppDebug.exists()) {
+            oldAppDebug.delete()
+        }
+        
+        if (appDebugApk.exists()) {
+            // Copy to the specified Github export folder
+            appDebugApk.copyTo(destApk, overwrite = true)
+            
+            // Also copy to active build folder so both has it
+            appDebugApk.copyTo(destInBuild, overwrite = true)
+        }
+    }
+}
+
+tasks.matching { it.name == "assembleDebug" }.configureEach {
+    finalizedBy("renameDebugApk")
+}
+
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
 // to match the convention used in Web projects.
 secrets {

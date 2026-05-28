@@ -30,6 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -192,60 +198,95 @@ fun TimerPickerScreen(
             .windowInsetsPadding(WindowInsets.safeDrawing),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Header Typography
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 16.dp)
+        if (isLandscape) {
+            // Landscape Layout: Header, PickerLayout, and Footer are vertically stacked and aligned with the wheels on the left, StartButton is on the right.
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 12.dp, horizontal = 24.dp)
             ) {
-                Text(
-                    text = "ROTARY TIMER",
-                    color = Color(0xFFFFBF00),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 4.sp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = "Spin wheels to set countdown duration",
-                    color = Color.White.copy(alpha = 0.5f),
-                    fontSize = 11.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            // Adaptive layout depending on Screen Orientation
-            if (isLandscape) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.wrapContentHeight()
                 ) {
+                    // Header Typography
+                    Text(
+                        text = "Timer (IOS-Standby Style)",
+                        color = Color(0xFFFFBF00),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 4.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Spin wheels to set countdown duration",
+                        color = Color.White.copy(alpha = 0.5f),
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
                     PickerLayout(
                         onHChange = { hours = it },
                         onMChange = { minutes = it },
                         onSChange = { seconds = it },
                         modifier = Modifier.wrapContentWidth()
                     )
-
-                    Spacer(modifier = Modifier.width(36.dp))
-
-                    StartButton(
-                        isEnabled = isStartEnabled,
-                        onClick = { onStart(hours, minutes, seconds) }
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
+                    // Selected duration footer aligned with wheels
+                    Text(
+                        text = "Selected: ${String.format("%02dh %02dm %02ds", hours, minutes, seconds)}",
+                        color = if (isStartEnabled) Color(0xFFFFBF00) else Color.White.copy(alpha = 0.25f),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp
                     )
                 }
-            } else {
+
+                Spacer(modifier = Modifier.width(48.dp))
+
+                StartButton(
+                    isEnabled = isStartEnabled,
+                    onClick = { onStart(hours, minutes, seconds) }
+                )
+            }
+        } else {
+            // Portrait Layout: Stacked top-to-bottom
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Header Typography
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text(
+                        text = "Timer (IOS-Standby Style)",
+                        color = Color(0xFFFFBF00),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 4.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Spin wheels to set countdown duration",
+                        color = Color.White.copy(alpha = 0.5f),
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -263,16 +304,16 @@ fun TimerPickerScreen(
                         onClick = { onStart(hours, minutes, seconds) }
                     )
                 }
-            }
 
-            // Beautiful footer status feedback
-            Text(
-                text = "Selected: ${String.format("%02dh %02dm %02ds", hours, minutes, seconds)}",
-                color = if (isStartEnabled) Color(0xFFFFBF00) else Color.White.copy(alpha = 0.25f),
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+                // Beautiful footer status feedback
+                Text(
+                    text = "Selected: ${String.format("%02dh %02dm %02ds", hours, minutes, seconds)}",
+                    color = if (isStartEnabled) Color(0xFFFFBF00) else Color.White.copy(alpha = 0.25f),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
         }
     }
 }
@@ -511,6 +552,22 @@ fun ActiveTimerScreen(
         }
     }
 
+    // Keep Screen Awake (Screen On flag) while active timer is running and not finished
+    DisposableEffect(isFinished) {
+        val activity = context as? Activity
+        val window = activity?.window
+        if (window != null) {
+            if (!isFinished) {
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+        onDispose {
+            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
     val progress = if (viewModel.totalDurationSeconds > 0) {
         remaining.toFloat() / viewModel.totalDurationSeconds
     } else 0f
@@ -529,7 +586,7 @@ fun ActiveTimerScreen(
 
     val alertColorAlpha by infiniteTransition.animateFloat(
         initialValue = 0.05f,
-        targetValue = 0.3f,
+        targetValue = 0.4f,
         animationSpec = infiniteRepeatable(
             animation = tween(600, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -537,6 +594,7 @@ fun ActiveTimerScreen(
         label = "AlertAlpha"
     )
 
+    // Ensure the whole screen blinks amber/yellow color on times-up as requested
     val screenBgColor = if (isFinished) {
         Color(0xFFFFBF00).copy(alpha = alertColorAlpha)
     } else {
@@ -548,29 +606,14 @@ fun ActiveTimerScreen(
             .fillMaxSize()
             .background(screenBgColor)
     ) {
-        // Full screen progress background decreasing from the right (anchored at left edge)
-        if (!isFinished) {
+        if (isFinished) {
+            // Alarm Status Finish View (high contrast full screen blink)
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(progress)
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(Color(0xFFFF8C00), Color(0xFFFFDF00))
-                        )
-                    )
-            )
-        }
-
-        // Overlay layout content supporting high contrast and visibility
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing),
-            contentAlignment = Alignment.Center
-        ) {
-            if (isFinished) {
-                // Alarm Status Finish View
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
+                contentAlignment = Alignment.Center
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -583,7 +626,7 @@ fun ActiveTimerScreen(
                         contentDescription = "Alarm Active",
                         tint = Color(0xFFFFBF00),
                         modifier = Modifier
-                            .size(80.dp)
+                            .size(90.dp)
                             .graphicsLayer {
                                 scaleX = alertScale
                                 scaleY = alertScale
@@ -618,77 +661,166 @@ fun ActiveTimerScreen(
                         )
                     }
                 }
-            } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 48.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Control Column Side
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(28.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Pause / Resume Control Action Button
-                            TimerControlButton(
-                                icon = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                contentDescription = if (isRunning) "Pause Timer" else "Resume Timer",
-                                tag = "pause_resume_button",
-                                onClick = {
-                                    if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
-                                }
-                            )
+            }
+        } else {
+            // Active countdown layout with masked dual-layer color inversion
+            
+            // Layer 1: Base Layer (Black background, White countdown text)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
+                contentAlignment = Alignment.Center
+            ) {
+                ActiveTimerContent(
+                    isRunning = isRunning,
+                    remaining = remaining,
+                    textColor = Color.White,
+                    controlColor = Color.White,
+                    buttonBgColor = Color.White.copy(alpha = 0.08f),
+                    onPauseResume = {
+                        if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
+                    },
+                    onCancel = {
+                        viewModel.cancelTimer()
+                        onCancel()
+                    },
+                    viewModel = viewModel
+                )
+            }
 
-                            // Cancel / Exit Screen action
-                            TimerControlButton(
-                                icon = Icons.Default.Close,
-                                contentDescription = "Cancel Timer",
-                                tag = "cancel_timer_button",
-                                onClick = {
-                                    viewModel.cancelTimer()
-                                    onCancel()
-                                }
-                            )
-                        }
-                    }
-
-                    // Typography Output Time Numbers
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1.3f)
-                            .padding(end = 16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(
-                            text = "TIMER REMAINING",
-                            color = Color(0xFFFFBF00),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 3.sp,
-                            modifier = Modifier.padding(bottom = 2.dp)
-                        )
-                        Text(
-                            text = viewModel.formatTime(remaining),
-                            color = if (remaining <= 5) Color(0xFFFF3B30) else Color.White,
-                            fontSize = 100.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            letterSpacing = (-2).sp,
-                            modifier = Modifier.testTag("active_timer_display")
-                        )
+            // Layer 2: Clipped Overlay Layer (Yellow progress background, Black countdown text)
+            val progressClipShape = remember(progress) {
+                object : Shape {
+                    override fun createOutline(
+                        size: Size,
+                        layoutDirection: LayoutDirection,
+                        density: Density
+                    ): Outline {
+                        return Outline.Rectangle(Rect(0f, 0f, size.width * progress, size.height))
                     }
                 }
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        clip = true
+                        shape = progressClipShape
+                    }
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(Color(0xFFFF8C00), Color(0xFFFFDF00))
+                        )
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ActiveTimerContent(
+                        isRunning = isRunning,
+                        remaining = remaining,
+                        textColor = Color.Black,
+                        controlColor = Color.Black,
+                        buttonBgColor = Color.Black.copy(alpha = 0.15f),
+                        onPauseResume = {
+                            if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
+                        },
+                        onCancel = {
+                            viewModel.cancelTimer()
+                            onCancel()
+                        },
+                        viewModel = viewModel
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ActiveTimerContent(
+    isRunning: Boolean,
+    remaining: Long,
+    textColor: Color,
+    controlColor: Color,
+    buttonBgColor: Color,
+    onPauseResume: () -> Unit,
+    onCancel: () -> Unit,
+    viewModel: TimerViewModel,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Control Column Side: moved slightly to the left with an offset
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .offset(x = (-24).dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(28.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Pause / Resume Control Action Button
+                TimerControlButton(
+                    icon = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = if (isRunning) "Pause Timer" else "Resume Timer",
+                    tag = "pause_resume_button",
+                    tint = controlColor,
+                    bgColor = buttonBgColor,
+                    onClick = onPauseResume
+                )
+
+                // Cancel / Exit Screen action
+                TimerControlButton(
+                    icon = Icons.Default.Close,
+                    contentDescription = "Cancel Timer",
+                    tag = "cancel_timer_button",
+                    tint = controlColor,
+                    bgColor = buttonBgColor,
+                    onClick = onCancel
+                )
+            }
+        }
+
+        // Typography Output Time Numbers
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1.3f)
+                .padding(end = 16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = "TIMER REMAINING",
+                color = if (textColor == Color.Black) Color.Black else Color(0xFFFFBF00),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.sp,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
+            Text(
+                text = viewModel.formatTime(remaining),
+                color = if (textColor == Color.White && remaining <= 5) Color(0xFFFF3B30) else textColor,
+                fontSize = 140.sp, // Enlarged font size
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                letterSpacing = (-2).sp,
+                modifier = Modifier.testTag("active_timer_display")
+            )
         }
     }
 }
@@ -698,13 +830,15 @@ fun TimerControlButton(
     icon: ImageVector,
     contentDescription: String,
     tag: String,
+    tint: Color = Color.White,
+    bgColor: Color = Color.White.copy(alpha = 0.08f),
     onClick: () -> Unit
 ) {
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = Color.White.copy(alpha = 0.08f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+        color = bgColor,
+        border = BorderStroke(1.dp, tint.copy(alpha = 0.15f)),
         modifier = Modifier
             .size(72.dp)
             .testTag(tag)
@@ -713,7 +847,7 @@ fun TimerControlButton(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = Color.White,
+                tint = tint,
                 modifier = Modifier.size(32.dp)
             )
         }
