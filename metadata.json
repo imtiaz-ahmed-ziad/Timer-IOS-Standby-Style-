@@ -1,0 +1,6 @@
+{
+  "name": "Timer (IOS-Standby Style)",
+  "description": "An elegant, visually polished countdown timer with a 3D responsive wheel selector and landscape-locked immersive active timer screen.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
