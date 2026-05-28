@@ -56,6 +56,13 @@ android {
     buildConfig = true
   }
   testOptions { unitTests { isIncludeAndroidResources = true } }
+
+  applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+            // Your wished name has beed updated here.
+            output.outputFileName = "Timer (IOS-Standby Style).apk"
 }
 
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
