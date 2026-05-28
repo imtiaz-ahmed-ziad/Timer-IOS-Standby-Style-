@@ -231,9 +231,6 @@ fun TimerPickerScreen(
                         .weight(1f)
                         .padding(horizontal = 16.dp)
                 ) {
-                    // Slightly offset the wheels of timer to the left
-                    Spacer(modifier = Modifier.weight(0.15f))
-
                     PickerLayout(
                         onHChange = { hours = it },
                         onMChange = { minutes = it },
@@ -247,8 +244,6 @@ fun TimerPickerScreen(
                         isEnabled = isStartEnabled,
                         onClick = { onStart(hours, minutes, seconds) }
                     )
-
-                    Spacer(modifier = Modifier.weight(0.05f))
                 }
             } else {
                 Column(
@@ -542,10 +537,16 @@ fun ActiveTimerScreen(
         label = "AlertAlpha"
     )
 
+    val screenBgColor = if (isFinished) {
+        Color(0xFFFFBF00).copy(alpha = alertColorAlpha)
+    } else {
+        Color.Black
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(screenBgColor)
     ) {
         // Full screen progress background decreasing from the right (anchored at left edge)
         if (!isFinished) {
@@ -573,7 +574,6 @@ fun ActiveTimerScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFFFFBF00).copy(alpha = alertColorAlpha))
                         .padding(32.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -619,83 +619,73 @@ fun ActiveTimerScreen(
                     }
                 }
             } else {
-                // Semi-translucent protection panel ensuring high readability as the background moves
-                Surface(
+                Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
-                    color = Color.Black.copy(alpha = 0.58f),
-                    shape = RoundedCornerShape(24.dp),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.12f))
+                        .padding(horizontal = 48.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
+                    // Control Column Side
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 32.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxHeight()
+                            .weight(1f),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Control Column Side
-                        Column(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(28.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(28.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Pause / Resume Control Action Button
-                                TimerControlButton(
-                                    icon = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                    contentDescription = if (isRunning) "Pause Timer" else "Resume Timer",
-                                    tag = "pause_resume_button",
-                                    onClick = {
-                                        if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
-                                    }
-                                )
-
-                                // Cancel / Exit Screen action
-                                TimerControlButton(
-                                    icon = Icons.Default.Close,
-                                    contentDescription = "Cancel Timer",
-                                    tag = "cancel_timer_button",
-                                    onClick = {
-                                        viewModel.cancelTimer()
-                                        onCancel()
-                                    }
-                                )
-                            }
-                        }
-
-                        // Typography Output Time Numbers
-                        Column(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1.3f)
-                                .padding(end = 16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = "TIMER REMAINING",
-                                color = Color(0xFFFFBF00),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 3.sp,
-                                modifier = Modifier.padding(bottom = 2.dp)
+                            // Pause / Resume Control Action Button
+                            TimerControlButton(
+                                icon = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (isRunning) "Pause Timer" else "Resume Timer",
+                                tag = "pause_resume_button",
+                                onClick = {
+                                    if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
+                                }
                             )
-                            Text(
-                                text = viewModel.formatTime(remaining),
-                                color = if (remaining <= 5) Color(0xFFFF3B30) else Color.White,
-                                fontSize = 100.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                letterSpacing = (-2).sp,
-                                modifier = Modifier.testTag("active_timer_display")
+
+                            // Cancel / Exit Screen action
+                            TimerControlButton(
+                                icon = Icons.Default.Close,
+                                contentDescription = "Cancel Timer",
+                                tag = "cancel_timer_button",
+                                onClick = {
+                                    viewModel.cancelTimer()
+                                    onCancel()
+                                }
                             )
                         }
+                    }
+
+                    // Typography Output Time Numbers
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1.3f)
+                            .padding(end = 16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            text = "TIMER REMAINING",
+                            color = Color(0xFFFFBF00),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 3.sp,
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        )
+                        Text(
+                            text = viewModel.formatTime(remaining),
+                            color = if (remaining <= 5) Color(0xFFFF3B30) else Color.White,
+                            fontSize = 100.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            letterSpacing = (-2).sp,
+                            modifier = Modifier.testTag("active_timer_display")
+                        )
                     }
                 }
             }
